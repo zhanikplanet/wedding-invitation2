@@ -1,0 +1,6 @@
+{
+  "name": "Үйлену тойына шақыру",
+  "description": "Элегантное свадебное пригласительное в казахском национальном стиле с музыкой, фотогалереей и картой проведения.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
