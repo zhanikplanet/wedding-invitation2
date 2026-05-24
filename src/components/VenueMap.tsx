@@ -6,20 +6,24 @@ interface VenueMapProps {
   venueName: string;
   venueAddress: string;
   mapQuery: string;
+  twoGisUrl?: string;
   isCreatorMode?: boolean;
   onQueryChange?: (query: string) => void;
   onVenueNameChange?: (name: string) => void;
   onAddressChange?: (address: string) => void;
+  onTwoGisUrlChange?: (url: string) => void;
 }
 
 export const VenueMap: React.FC<VenueMapProps> = ({
   venueName,
   venueAddress,
   mapQuery,
+  twoGisUrl = "",
   isCreatorMode = false,
   onQueryChange,
   onVenueNameChange,
   onAddressChange,
+  onTwoGisUrlChange,
 }) => {
   // Generate safe google maps embed URL based on search query
   const safeSearchQuery = encodeURIComponent(mapQuery || "Ресторан Салтанат, Алматы");
@@ -28,6 +32,7 @@ export const VenueMap: React.FC<VenueMapProps> = ({
   // Navigation links
   const gMapsUrl = `https://www.google.com/maps/search/?api=1&query=${safeSearchQuery}`;
   const yMapsUrl = `https://yandex.com/maps/?text=${safeSearchQuery}`;
+  const resolved2GisUrl = twoGisUrl || "https://2gis.kz/almaty";
 
   return (
     <div id="venue-map-section" className="bg-editorial-bg border border-editorial-accent/20 rounded-3xl p-6 shadow-lg max-w-lg w-full mx-auto relative overflow-hidden">
@@ -77,26 +82,38 @@ export const VenueMap: React.FC<VenueMapProps> = ({
         </div>
 
         {/* Navigation Actions */}
-        <div className="grid grid-cols-2 gap-3" id="navigation-actions">
+        <div className="space-y-3" id="navigation-actions">
           <a
-            href={gMapsUrl}
+            href={resolved2GisUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center justify-center gap-2 py-3 px-4 bg-editorial-accent hover:bg-editorial-accent/90 text-white text-xs font-semibold uppercase tracking-wider rounded-xl shadow-sm transition-all text-center cursor-pointer"
+            className="w-full flex items-center justify-center gap-2 py-3 bg-[#2DB200] hover:bg-[#259400] text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-md transition-all text-center cursor-pointer"
           >
-            <Navigation size={14} />
-            Google Карта
+            <span className="font-sans font-black tracking-tight text-sm">2GIS</span>
+            <span>2GIS КАРТАСЫНДА АШУ</span>
           </a>
 
-          <a
-            href={yMapsUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center justify-center gap-2 py-3 px-4 bg-[#F5F1E6] hover:bg-editorial-accent/10 border border-stone-200 text-editorial-text text-xs font-semibold uppercase tracking-wider rounded-xl shadow-sm transition-all text-center cursor-pointer"
-          >
-            <MapPin size={14} className="text-editorial-accent" />
-            Yandex Карта
-          </a>
+          <div className="grid grid-cols-2 gap-3">
+            <a
+              href={gMapsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2 py-3 px-2 bg-editorial-accent hover:bg-editorial-accent/90 text-white text-[11px] font-semibold uppercase tracking-wider rounded-xl shadow-sm transition-all text-center cursor-pointer"
+            >
+              <Navigation size={13} />
+              Google Карта
+            </a>
+
+            <a
+              href={yMapsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2 py-3 px-2 bg-[#F5F1E6] hover:bg-editorial-accent/10 border border-stone-200 text-editorial-text text-[11px] font-semibold uppercase tracking-wider rounded-xl shadow-sm transition-all text-center cursor-pointer"
+            >
+              <MapPin size={13} className="text-editorial-accent" />
+              Yandex Карта
+            </a>
+          </div>
         </div>
 
         {/* Creator Mode customization */}
@@ -105,7 +122,7 @@ export const VenueMap: React.FC<VenueMapProps> = ({
             <p className="font-bold text-editorial-text">Картаны теңшеу (Creator Mode):</p>
             
             <div>
-              <label className="block text-editorial-text font-medium mb-1">Салтанат Сарайы Атауы:</label>
+              <label className="block text-editorial-text font-medium mb-1">Салтанат Сарайы Атауы / Ғимарат:</label>
               <input
                 type="text"
                 id="edit-venue-name"
@@ -129,7 +146,19 @@ export const VenueMap: React.FC<VenueMapProps> = ({
             </div>
 
             <div>
-              <label className="block text-editorial-text font-medium mb-1">Картаға іздеу Сұранысы:</label>
+              <label className="block text-editorial-text font-medium mb-1">2GIS Сілтемесі (URL):</label>
+              <input
+                type="text"
+                id="edit-twogis-url"
+                value={twoGisUrl}
+                onChange={(e) => onTwoGisUrlChange && onTwoGisUrlChange(e.target.value)}
+                className="w-full p-2 border border-editorial-accent/30 rounded bg-white text-editorial-text focus:outline-none focus:border-editorial-accent font-mono text-[11px]"
+                placeholder="Мысалы: https://2gis.kz/almaty/..."
+              />
+            </div>
+
+            <div>
+              <label className="block text-editorial-text font-medium mb-1">Картаға іздеу Сұранысы (Google/Yandex үшін):</label>
               <input
                 type="text"
                 id="edit-map-query"

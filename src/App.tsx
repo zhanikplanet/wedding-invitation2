@@ -32,19 +32,37 @@ const COUPLE_IMAGE = "/src/assets/images/kazakh_wedding_couple_1779548064433.png
 const BG_ORNAMENT = "/src/assets/images/kazakh_gold_ornaments_bg_1779548084863.png";
 
 const DEFAULT_CONFIG: WeddingConfig = {
-  brideName: "Балнұр",
-  groomName: "Әділет",
-  brideParents: "Дархан & Баян",
-  groomParents: "Болат & Сәуле",
-  date: "2026-09-20", // Configured matching video sequence days
-  time: "19:00",
-  venueName: "«ЖАСМИН» Салтанат сарайы",
-  venueAddress: "Шымкент қаласы, Арғынбеков көшесі, 121",
-  coordinates: { lat: 42.3417, lng: 69.5901 },
-  mapQuery: "Шымкент Аргынбекова 121 Жасмин ресторан",
+  brideName: "Ақжан",
+  groomName: "Шыңғыс",
+  brideParents: "Болат & Сәуле",
+  groomParents: "Ерлан & Алма",
+  date: "2026-08-25",
+  time: "17:00",
+  weddingDate: "2026-08-25",
+  uzatuDate: "2026-08-18",
+  weddingTime: "17:00",
+  uzatuTime: "17:00",
+  venueName: "Құрылысы жүріп жатқан әкімшілік ғимарат",
+  venueAddress: "Алматы қаласы, 2GIS сілтемесі бойынша",
+  twoGisUrl: "https://2gis.kz/almaty/geo/70030076996008465/77.043740,43.309045",
+  coordinates: { lat: 43.309045, lng: 77.043740 },
+  mapQuery: "43.309045,77.043740",
+  
+  weddingVenueName: "Құрылысы жүріп жатқан әкімшілік ғимарат",
+  weddingVenueAddress: "Алматы қаласы, 2GIS сілтемесі бойынша",
+  weddingTwoGisUrl: "https://2gis.kz/almaty/geo/70030076996008465/77.043740,43.309045",
+  weddingMapQuery: "43.309045,77.043740",
+  
+  uzatuVenueName: "«Aqpeil» мейрамханасы",
+  uzatuVenueAddress: "Талдықорған қаласы, 2GIS сілтемесі бойынша",
+  uzatuTwoGisUrl: "https://2gis.kz/almaty/geo/70000001101735389/78.413457,45.017123",
+  uzatuMapQuery: "45.017123,78.413457",
+
   musicUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
   musicTitle: "Қоңыр әуен (Piano Instrumental Romance)",
   additionalInfo: "ҮЙЛЕНУ ТОЙЫНА АРНАЛҒАН САЛТАНАТТЫ АҚ ДАСТАРХАНЫМЫЗДЫҢ ҚАДІРЛІ ҚОНАҒЫ БОЛУҒА ШАҚЫРАМЫЗ!",
+  weddingAdditionalInfo: "Шыңғыс пен Ақжанның үйлену тойына арналған салтанатты ақ дастарханымыздың қадірлі қонағы болуға шақырамыз!",
+  uzatuAdditionalInfo: "Аяулы қызымыз Ақжанның Қыз ұзату тойына арналған салтанатты ақ дастарханымыздың қадірлі қонағы болуға шақырамыз!",
 };
 
 export default function App() {
@@ -52,11 +70,21 @@ export default function App() {
   const [config, setConfig] = useState<WeddingConfig>(DEFAULT_CONFIG);
   const [responses, setResponses] = useState<GuestResponse[]>([]);
   const [isCreatorOpen, setIsCreatorOpen] = useState(false);
+  const [eventType, setEventType] = useState<'wedding' | 'uzatu'>('wedding');
   
   // Audio state hoisted here
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  // Resolved dynamic active parameters
+  const activeDate = eventType === "wedding" ? (config.weddingDate || config.date) : (config.uzatuDate || "2026-08-18");
+  const activeTime = eventType === "wedding" ? (config.weddingTime || config.time) : (config.uzatuTime || "17:00");
+  const activeAdditionalInfo = eventType === "wedding" ? (config.weddingAdditionalInfo || config.additionalInfo) : (config.uzatuAdditionalInfo || "ҚЫЗ ҰЗАТУ ТОЙЫНА АРНАЛҒАН САЛТАНАТТЫ АҚ ДАСТАРХАНЫМЫЗДЫҢ ҚАДІРЛІ ҚОНАҒЫ БОЛУҒА ШАҚЫРАМЫЗ!");
+  const activeVenueName = eventType === "wedding" ? (config.weddingVenueName || config.venueName) : (config.uzatuVenueName || "«Aqpeil» мейрамханасы");
+  const activeVenueAddress = eventType === "wedding" ? (config.weddingVenueAddress || config.venueAddress) : (config.uzatuVenueAddress || "Талдықорған қаласы, 2GIS сілтемесі бойынша");
+  const activeTwoGisUrl = eventType === "wedding" ? (config.weddingTwoGisUrl || config.twoGisUrl) : (config.uzatuTwoGisUrl || "https://2gis.kz/almaty/geo/70000001101735389/78.413457,45.017123");
+  const activeMapQuery = eventType === "wedding" ? (config.weddingMapQuery || config.mapQuery) : (config.uzatuMapQuery || "45.017123,78.413457");
 
   // Countdown state
   const [timeLeft, setTimeLeft] = useState({
@@ -112,7 +140,7 @@ export default function App() {
   // Recalculate countdown
   useEffect(() => {
     const calculateTimeLeft = () => {
-      const targetDate = new Date(`${config.date}T${config.time}`);
+      const targetDate = new Date(`${activeDate}T${activeTime}`);
       const difference = +targetDate - +new Date();
       
       if (difference <= 0) {
@@ -132,7 +160,7 @@ export default function App() {
     calculateTimeLeft();
     const interval = setInterval(calculateTimeLeft, 1000);
     return () => clearInterval(interval);
-  }, [config.date, config.time]);
+  }, [activeDate, activeTime]);
 
   const handleEnvelopeOpen = (startMusic: boolean) => {
     setIsOpen(true);
@@ -182,8 +210,8 @@ export default function App() {
   };
 
   // Format date readable for Kazakh text folds
-  const formattedDayNum = config.date.split("-")[2];
-  const yearText = config.date.split("-")[0];
+  const formattedDayNum = activeDate.split("-")[2];
+  const yearText = activeDate.split("-")[0];
 
   return (
     <div className="min-h-screen bg-editorial-bg text-editorial-text font-sans relative border-8 md:border-[16px] border-editorial-border overflow-x-hidden selection:bg-editorial-accent/20">
@@ -211,7 +239,7 @@ export default function App() {
       )}
 
       {/* Floating customize badge - top left */}
-      <div className="fixed top-4 left-4 z-40">
+      {/* <div className="fixed top-4 left-4 z-40">
         <button
           id="creator-toggle-btn"
           onClick={() => setIsCreatorOpen(!isCreatorOpen)}
@@ -220,7 +248,7 @@ export default function App() {
           <Settings size={14} className={isCreatorOpen ? "rotate-90 transition-transform duration-300" : ""} />
           <span>{isCreatorOpen ? "Тапсырыс беру" : "Теңшеу / Настройки"}</span>
         </button>
-      </div>
+      </div> */}
 
       {/* Rotating music badge on the bottom left - directly from video style */}
       {isOpen && (
@@ -290,38 +318,76 @@ export default function App() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-2">
-              <div>
-                <label className="block text-stone-400 mb-1 font-medium">Той күні:</label>
-                <input
-                  type="date"
-                  id="input-date"
-                  value={config.date}
-                  onChange={(e) => setConfig({ ...config, date: e.target.value })}
-                  className="w-full p-2 bg-stone-800 rounded border border-stone-700 text-white focus:outline-none focus:border-amber-500 font-mono"
-                />
+            <div className="border-t border-stone-800 pt-2 shrink-0">
+              <p className="text-[10px] font-mono tracking-widest text-amber-400 font-bold uppercase mb-1.5">1. Үйлену тойы мәліметтері:</p>
+              <div className="grid grid-cols-2 gap-2 mb-2">
+                <div>
+                  <label className="block text-stone-400 mb-1 font-medium text-[10px]">Үйлену тойы Күні:</label>
+                  <input
+                    type="date"
+                    id="input-wedding-date"
+                    value={config.weddingDate || config.date}
+                    onChange={(e) => setConfig({ ...config, weddingDate: e.target.value, date: e.target.value })}
+                    className="w-full p-2 bg-stone-800 rounded border border-stone-700 text-white focus:outline-none focus:border-amber-500 font-mono text-[11px]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-stone-400 mb-1 font-medium text-[10px]">Уақыты (сигнал):</label>
+                  <input
+                    type="time"
+                    id="input-wedding-time"
+                    value={config.weddingTime || config.time}
+                    onChange={(e) => setConfig({ ...config, weddingTime: e.target.value, time: e.target.value })}
+                    className="w-full p-2 bg-stone-800 rounded border border-stone-700 text-white focus:outline-none focus:border-amber-500 font-mono text-[11px]"
+                  />
+                </div>
               </div>
               <div>
-                <label className="block text-stone-400 mb-1 font-medium">Уақыты:</label>
-                <input
-                  type="time"
-                  id="input-time"
-                  value={config.time}
-                  onChange={(e) => setConfig({ ...config, time: e.target.value })}
-                  className="w-full p-2 bg-stone-800 rounded border border-stone-700 text-white focus:outline-none focus:border-amber-500 font-mono"
+                <label className="block text-stone-400 mb-1 font-medium text-[10px]">Үйлену тойы шақыру мәтіні:</label>
+                <textarea
+                  id="input-wedding-additional"
+                  rows={2}
+                  value={config.weddingAdditionalInfo || config.additionalInfo}
+                  onChange={(e) => setConfig({ ...config, weddingAdditionalInfo: e.target.value, additionalInfo: e.target.value })}
+                  className="w-full p-2 bg-stone-800 rounded border border-stone-700 text-white focus:outline-none focus:border-amber-500 text-[11px] leading-normal"
                 />
               </div>
             </div>
 
-            <div>
-              <label className="block text-stone-400 mb-1 font-medium">Тойға шақыру мәтіні:</label>
-              <textarea
-                id="input-additional"
-                rows={3}
-                value={config.additionalInfo}
-                onChange={(e) => setConfig({ ...config, additionalInfo: e.target.value })}
-                className="w-full p-2 bg-stone-800 rounded border border-stone-700 text-white focus:outline-none focus:border-amber-500 text-xs leading-relaxed"
-              />
+            <div className="border-t border-stone-800 pt-2 shrink-0">
+              <p className="text-[10px] font-mono tracking-widest text-amber-400 font-bold uppercase mb-1.5">2. Қыз ұзату мәліметтері:</p>
+              <div className="grid grid-cols-2 gap-2 mb-2">
+                <div>
+                  <label className="block text-stone-400 mb-1 font-medium text-[10px]">Қыз ұзату Күні:</label>
+                  <input
+                    type="date"
+                    id="input-uzatu-date"
+                    value={config.uzatuDate || "2026-08-18"}
+                    onChange={(e) => setConfig({ ...config, uzatuDate: e.target.value })}
+                    className="w-full p-2 bg-stone-800 rounded border border-stone-700 text-white focus:outline-none focus:border-amber-500 font-mono text-[11px]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-stone-400 mb-1 font-medium text-[10px]">Уақыты (сигнал):</label>
+                  <input
+                    type="time"
+                    id="input-uzatu-time"
+                    value={config.uzatuTime || "17:00"}
+                    onChange={(e) => setConfig({ ...config, uzatuTime: e.target.value })}
+                    className="w-full p-2 bg-stone-800 rounded border border-stone-700 text-white focus:outline-none focus:border-amber-500 font-mono text-[11px]"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-stone-400 mb-1 font-medium text-[10px]">Қыз ұзату шақыру мәтіні:</label>
+                <textarea
+                  id="input-uzatu-additional"
+                  rows={2}
+                  value={config.uzatuAdditionalInfo || "ҚЫЗ ҰЗАТУ ТОЙЫНА АРНАЛҒАН САЛТАНАТТЫ АҚ ДАСТАРХАНЫМЫЗДЫҢ ҚАДІРЛІ ҚОНАҒЫ БОЛУҒА ШАҚЫРАМЫЗ!"}
+                  onChange={(e) => setConfig({ ...config, uzatuAdditionalInfo: e.target.value })}
+                  className="w-full p-2 bg-stone-800 rounded border border-stone-700 text-white focus:outline-none focus:border-amber-500 text-[11px] leading-normal"
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -339,6 +405,34 @@ export default function App() {
           </div>
           <div className="absolute top-0 right-0 pointer-events-none">
             <CornerOrnament size={64} position="top-right" />
+          </div>
+
+          {/* PREMIUM TOY SELECTOR TABS */}
+          <div className="flex justify-center p-1 bg-stone-100/80 border border-editorial-accent/20 rounded-2xl max-w-sm mx-auto shadow-sm relative z-20">
+            <button
+              id="tab-wedding"
+              onClick={() => setEventType('wedding')}
+              className={`flex-1 py-2.5 px-3 text-xs font-bold uppercase tracking-wider rounded-xl transition-all duration-300 flex flex-col items-center justify-center cursor-pointer ${
+                eventType === 'wedding'
+                  ? 'bg-editorial-accent text-white shadow-md scale-[1.02]'
+                  : 'text-stone-500 hover:text-editorial-text hover:bg-stone-50/50'
+              }`}
+            >
+              <span className="text-[9px] opacity-80 tracking-normal font-mono">25 ТАМЫЗ</span>
+              <span>Үйлену тойы</span>
+            </button>
+            <button
+              id="tab-uzatu"
+              onClick={() => setEventType('uzatu')}
+              className={`flex-1 py-2.5 px-3 text-xs font-bold uppercase tracking-wider rounded-xl transition-all duration-300 flex flex-col items-center justify-center cursor-pointer ${
+                eventType === 'uzatu'
+                  ? 'bg-editorial-accent text-white shadow-md scale-[1.02]'
+                  : 'text-stone-500 hover:text-editorial-text hover:bg-stone-50/50'
+              }`}
+            >
+              <span className="text-[9px] opacity-80 tracking-normal font-mono">18 ТАМЫЗ</span>
+              <span>Қыз ұзату</span>
+            </button>
           </div>
 
           {/* SECTION 1: COVER HERO IMAGE WITH PAIR NAMES */}
@@ -365,24 +459,37 @@ export default function App() {
             {/* Couple names and Day heading (Classic italic with golden accent) */}
             <div className="space-y-4">
               <h1 className="text-4xl md:text-5xl font-display text-editorial-text tracking-wide font-normal leading-tight">
-                <span className="block italic hover:text-editorial-accent transition-colors duration-300 font-serif">
-                  {config.groomName}
-                </span>
-                <span className="font-decorative text-editorial-accent text-5xl md:text-6xl my-2 block">
-                  &
-                </span>
-                <span className="block italic hover:text-editorial-accent transition-colors duration-300 font-serif">
-                  {config.brideName}
-                </span>
+                {eventType === 'wedding' ? (
+                  <>
+                    <span className="block italic hover:text-editorial-accent transition-colors duration-300 font-serif">
+                      {config.groomName}
+                    </span>
+                    <span className="font-decorative text-editorial-accent text-5xl md:text-6xl my-2 block">
+                      &
+                    </span>
+                    <span className="block italic hover:text-editorial-accent transition-colors duration-300 font-serif">
+                      {config.brideName}
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <span className="block italic hover:text-editorial-accent transition-colors duration-300 font-serif text-5xl md:text-6xl">
+                      {config.brideName}
+                    </span>
+                    <span className="text-xs font-mono tracking-widest text-[#C5A059] font-bold uppercase mt-2 block">
+                      ҚЫЗ ҰЗАТУ ТОЙЫ
+                    </span>
+                  </>
+                )}
               </h1>
               
               <div className="flex flex-col items-center justify-center space-y-1.5 pt-2">
                 <div className="h-[1px] w-28 bg-gradient-to-r from-transparent via-editorial-accent to-transparent" />
-                <p className="text-xs font-mono tracking-[0.3em] text-editorial-accent font-bold uppercase">
-                  WEDDING DAY
+                <p className="text-xs font-mono tracking-[0.3em] text-editorial-accent font-bold uppercase animate-pulse">
+                  {eventType === 'wedding' ? 'WEDDING DAY' : 'FAREWELL DAY'}
                 </p>
                 <p className="text-base font-serif font-bold tracking-widest text-[#C5A059] font-mono">
-                  {config.date.split("-").reverse().join(".")}
+                  {activeDate.split("-").reverse().join(".")}
                 </p>
                 <div className="h-[1px] w-28 bg-gradient-to-r from-transparent via-editorial-accent to-transparent" />
               </div>
@@ -408,17 +515,24 @@ export default function App() {
             </h2>
 
             <p className="text-xs font-mono tracking-widest text-[#C5A059] font-extrabold uppercase">
-              СІЗДЕРДІ БАЛАЛАРЫМЫЗ
+              {eventType === 'wedding' ? 'СІЗДЕРДІ БАЛАЛАРЫМЫЗ' : 'СІЗДЕРДІ ҚЫЗЫМЫЗ СӘТІМЕН'}
             </p>
 
-            <div className="space-y-3 font-serif italic text-2xl text-editorial-text">
-              <p className="text-editorial-accent font-medium leading-none">{config.groomName}</p>
-              <p className="text-xs font-mono not-italic tracking-wider uppercase text-editorial-text/50">пен</p>
-              <p className="text-editorial-accent font-medium leading-none">{config.brideName}дың</p>
-            </div>
+            {eventType === 'wedding' ? (
+              <div className="space-y-3 font-serif italic text-2xl text-editorial-text">
+                <p className="text-editorial-accent font-medium leading-none">{config.groomName}</p>
+                <p className="text-xs font-mono not-italic tracking-wider uppercase text-editorial-text/50">пен</p>
+                <p className="text-editorial-accent font-medium leading-none">{config.brideName}дың</p>
+              </div>
+            ) : (
+              <div className="space-y-3 font-serif italic text-2xl text-editorial-text">
+                <p className="text-editorial-accent font-medium leading-none">{config.brideName}</p>
+                <p className="text-xs font-mono not-italic tracking-wider uppercase text-editorial-text/50">бойжеткеннің</p>
+              </div>
+            )}
 
             <p className="text-sm text-editorial-text leading-relaxed font-sans font-medium px-4">
-              {config.additionalInfo}
+              {activeAdditionalInfo}
             </p>
 
             <div className="h-[1px] w-24 bg-gradient-to-r from-transparent via-editorial-accent/30 to-transparent mx-auto" />
@@ -428,14 +542,14 @@ export default function App() {
 
           {/* SECTION 3: CALENDAR GRID HIGHLIGHTING */}
           <div className="space-y-4">
-            <KazakhCalendar dateString={config.date} />
+            <KazakhCalendar dateString={activeDate} />
             
             <div className="text-center pt-2">
               <p className="text-xs font-mono tracking-widest text-editorial-accent uppercase font-bold">
                 БАСТАЛУЫ • НАЧАЛО
               </p>
               <h4 className="text-lg font-serif font-bold text-editorial-text mt-1">
-                САҒАТ {config.time}-ДЕ
+                САҒАТ {activeTime}-ДЕ
               </h4>
             </div>
           </div>
@@ -444,7 +558,7 @@ export default function App() {
 
           {/* SECTION 4: PROGRAM TIMELINE */}
           <div className="space-y-2">
-            <CelebrationTimeline />
+            <CelebrationTimeline eventType={eventType} />
           </div>
 
           <LaceBorder className="my-2" />
@@ -452,13 +566,39 @@ export default function App() {
           {/* SECTION 5: INTERACTIVE LOCATION & VENUE MAP */}
           <div className="space-y-4">
             <VenueMap
-              venueName={config.venueName}
-              venueAddress={config.venueAddress}
-              mapQuery={config.mapQuery}
+              venueName={activeVenueName}
+              venueAddress={activeVenueAddress}
+              mapQuery={activeMapQuery}
+              twoGisUrl={activeTwoGisUrl}
               isCreatorMode={isCreatorOpen}
-              onQueryChange={(query) => setConfig({ ...config, mapQuery: query })}
-              onVenueNameChange={(n) => setConfig({ ...config, venueName: n })}
-              onAddressChange={(a) => setConfig({ ...config, venueAddress: a })}
+              onQueryChange={(query) => {
+                if (eventType === "wedding") {
+                  setConfig({ ...config, weddingMapQuery: query, mapQuery: query });
+                } else {
+                  setConfig({ ...config, uzatuMapQuery: query });
+                }
+              }}
+              onVenueNameChange={(n) => {
+                if (eventType === "wedding") {
+                  setConfig({ ...config, weddingVenueName: n, venueName: n });
+                } else {
+                  setConfig({ ...config, uzatuVenueName: n });
+                }
+              }}
+              onAddressChange={(a) => {
+                if (eventType === "wedding") {
+                  setConfig({ ...config, weddingVenueAddress: a, venueAddress: a });
+                } else {
+                  setConfig({ ...config, uzatuVenueAddress: a });
+                }
+              }}
+              onTwoGisUrlChange={(url) => {
+                if (eventType === "wedding") {
+                  setConfig({ ...config, weddingTwoGisUrl: url, twoGisUrl: url });
+                } else {
+                  setConfig({ ...config, uzatuTwoGisUrl: url });
+                }
+              }}
             />
           </div>
 

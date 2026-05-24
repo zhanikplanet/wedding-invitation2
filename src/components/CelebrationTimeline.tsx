@@ -10,13 +10,17 @@ interface TimelineEvent {
   icon: React.ReactNode;
 }
 
-export const CelebrationTimeline: React.FC = () => {
-  const events: TimelineEvent[] = [
+interface CelebrationTimelineProps {
+  eventType?: "wedding" | "uzatu";
+}
+
+export const CelebrationTimeline: React.FC<CelebrationTimelineProps> = ({ eventType = "wedding" }) => {
+  const weddingEvents: TimelineEvent[] = [
     {
       time: "17:00",
       title: "Қонақтарды қарсы алу",
       subtitle: "Сбор гостей & Welcome Drink",
-      desc: "Той қонақтарының жиналуы, ақ тілек кітабын толтыру, естелік фотосессия.",
+      desc: "Той қонақтарының жиналуы, ақ тілек хаттарын толтыру, естелік фотосессия.",
       icon: <Users size={18} className="text-editorial-accent" />,
     },
     {
@@ -55,6 +59,53 @@ export const CelebrationTimeline: React.FC = () => {
       icon: <Flame size={18} className="text-editorial-accent" />,
     },
   ];
+
+  const uzatuEvents: TimelineEvent[] = [
+    {
+      time: "17:00",
+      title: "Қонақтарды қарсы алу",
+      subtitle: "Сбор гостей & Welcome Drink",
+      desc: "Той қонақтарының жиналуы, ақ тілектер жазу, естелік суретке түсу.",
+      icon: <Users size={18} className="text-editorial-accent" />,
+    },
+    {
+      time: "18:00",
+      title: "Құттықтау сәттері",
+      subtitle: "Ақ тілектер мен сыйлықтар",
+      desc: "Келген туған-туыстар мен достардың жас аруға арнаған ізгі тілектері мен сый-сияпат құрметі.",
+      icon: <GlassWater size={18} className="text-editorial-accent" />,
+    },
+    {
+      time: "19:00",
+      title: "Салтанатты ашылу",
+      subtitle: "Қыз ұзату тойының басталуы",
+      desc: "Асабаның ұзату тойын салтанатты түрде ашуы, үлкендердің ақ батасы.",
+      icon: <HeartHandshake size={18} className="text-editorial-accent" />,
+    },
+    {
+      time: "20:30",
+      title: "Сый-құрмет & Ас мәзірі",
+      subtitle: "Салтанатты дастархан",
+      desc: "Дәстүрлі ұлттық тағамдарды ұсыну, қонақтарға құрмет көрсету рәсімдері.",
+      icon: <Gift size={18} className="text-editorial-accent" />,
+    },
+    {
+      time: "22:30",
+      title: "Сыңсу және Қоштасу",
+      subtitle: "Қыздың мұңы мен қоштасу әні",
+      desc: "Жас арудың туған жұртымен, құрбы-құрдастарымен қоштасу кеші, қимас сәттер.",
+      icon: <Sparkles size={18} className="text-editorial-accent" />,
+    },
+    {
+      time: "23:00",
+      title: "Ақ жол рәсімі",
+      subtitle: "Шығарып салу сәті",
+      desc: "Жас келінді ақ жолдың үстімен жаңа отауына ақ батамен шығарып салу рәсімі.",
+      icon: <Flame size={18} className="text-editorial-accent" />,
+    },
+  ];
+
+  const events = eventType === "uzatu" ? uzatuEvents : weddingEvents;
 
   return (
     <div id="timeline-section" className="relative max-w-2xl mx-auto py-8">

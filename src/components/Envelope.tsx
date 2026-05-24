@@ -66,7 +66,7 @@ export const Envelope: React.FC<EnvelopeProps> = ({
               Тойға шақыру • Свадебное пригласительное
             </p>
             <h2 className="text-3xl font-serif text-editorial-text tracking-wide font-medium">
-              Алихан & Аружан
+              {groomName} & {brideName}
             </h2>
             <p className="text-[11px] font-sans text-[#4A3728]/70 italic">
               Ұлы мерекеміздің қадірлі қонағы болыңыз!
@@ -101,7 +101,7 @@ export const Envelope: React.FC<EnvelopeProps> = ({
             className="mt-4 px-8 py-3.5 bg-editorial-accent hover:bg-editorial-accent/90 text-white rounded-full font-bold uppercase text-xs tracking-widest transition-all duration-200 shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] outline-none border-none flex items-center gap-2 cursor-pointer"
           >
             <MailOpen size={14} />
-            <span>ШҚЫРУДЫ АШУ</span>
+            <span>ШАҚЫРУДЫ АШУ</span>
           </button>
         </div>
 
